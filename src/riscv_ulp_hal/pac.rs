@@ -7,8 +7,8 @@
 use super::reg::bit;
 
 pub const DR_REG_SENS_BASE: u32 = 0x3f408800;
-pub const DR_REG_RTCIO_BASE: u32 = 0x3ff48400;
-pub const DR_REG_RTCCNTL_BASE: u32 = 0x3f408000;
+pub const DR_REG_RTCIO_BASE: u32 = 0x60008400;
+pub const DR_REG_RTCCNTL_BASE: u32 = 0x60008000;
 
 pub const RTC_CNTL_COCPU_CTRL_REG: u32 = DR_REG_RTCCNTL_BASE + 0x0100;
 pub const RTC_CNTL_COCPU_DONE: u32 = bit(25);
