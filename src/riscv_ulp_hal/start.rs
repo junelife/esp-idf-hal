@@ -17,18 +17,19 @@ pub static __ONCE__: () = ();
 /// Calls main. This function never returns.
 #[link_section = ".start.rust"]
 #[export_name = "_start_rust"]
-pub unsafe extern "C" fn start_rust() -> ! {
+pub unsafe extern "C" fn start_rust() {
     #[rustfmt::skip]
     extern "Rust" {
         // This symbol will be provided by the user
-        fn main();
+        fn ulp_main();
     }
 
     cpu::rescue_from_monitor();
 
-    main();
+    ulp_main();
 
-    cpu::shutdown();
+    cpu::ulp_riscv_halt();
+
 }
 
 /// Registers saved in trap handler
