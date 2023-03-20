@@ -11,6 +11,8 @@ fn main() {
     let riscv_ulp_dir = std::env::current_dir().unwrap().join("riscv-ulp");
     println!("cargo:rustc-link-search={}", riscv_ulp_dir.display());
 
+    println!("cargo:rustc-link-lib=static=riscv_ulp_start");
+    
     println!(
         "cargo:rerun-if-changed={}",
         riscv_ulp_dir.join("libriscv_ulp_start.a").display()
