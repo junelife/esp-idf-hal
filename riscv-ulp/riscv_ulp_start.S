@@ -22,7 +22,7 @@ _start:
 	/* setup the stack pointer */
 	la sp, _stack_top
     // call _start_rust (in start.rs)
-    // will automatically do restore and halt after ulp_main is run
+    // will automatically do restore and halt after main is run
     jal zero, _start_rust
 loop:
 	j loop
