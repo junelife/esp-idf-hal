@@ -21,12 +21,12 @@ pub unsafe extern "C" fn start_rust() {
     #[rustfmt::skip]
     extern "Rust" {
         // This symbol will be provided by the user
-        fn ulp_main();
+        fn main();
     }
 
     cpu::rescue_from_monitor();
 
-    ulp_main();
+    main();
 
     cpu::ulp_riscv_halt();
 
