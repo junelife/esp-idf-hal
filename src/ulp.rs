@@ -132,14 +132,7 @@ impl<'d> UlpDriver<'d> {
 
     pub fn stop(&mut self) -> Result<(), esp_idf_sys::EspError> {
         unsafe {
-            // disable ULP timer
-            core::ptr::write_volatile(
-                ULP::TIMER_REG,
-                core::ptr::read_volatile(ULP::TIMER_REG) & !ULP::TIMER_EN_BIT,
-            );
-
-            // wait for at least 1 RTC_SLOW_CLK cycle
-            esp_idf_sys::esp_rom_delay_us(10);
+            unsafe { esp_idf_sys::ulp_riscv_halt() };
         }
 
         Ok(())
