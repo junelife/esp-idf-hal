@@ -67,7 +67,9 @@ pub unsafe fn gpio_set_direction(gpio_num: i32, direction: u8) {
         return;
     } else {
         // Init
-        set_peri_reg_mask(SENS_SAR_IO_MUX_CONF_REG, SENS_IOMUX_CLK_GATE_EN_M);
+        //set_peri_reg_mask(SENS_SAR_IO_MUX_CONF_REG, SENS_IOMUX_CLK_GATE_EN_M);
+        //FOR ESP32 S3 this is different:
+        set_peri_reg_mask(SENS_SAR_PERI_CLK_GATE_CONF_REG, SENS_IOMUX_CLK_EN_M);
         set_peri_reg_mask(
             RTC_IO_TOUCH_PAD0_REG + gpio_num as u32 * 4,
             RTC_IO_TOUCH_PAD0_MUX_SEL,
