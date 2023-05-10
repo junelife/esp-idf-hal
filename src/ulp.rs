@@ -132,7 +132,7 @@ impl<'d> UlpDriver<'d> {
 
     pub fn stop(&mut self) -> Result<(), esp_idf_sys::EspError> {
         unsafe {
-            unsafe { esp_idf_sys::ulp_riscv_halt() };
+            esp_idf_sys::ulp_riscv_halt();
         }
 
         Ok(())
