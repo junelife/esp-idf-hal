@@ -439,7 +439,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     /// Return an error if the pin cannot be set as input.
     #[inline]
     pub fn try_into_input(self, pull: Pull) -> Result<PinDriver<'d, Input>, EspError> {
-        let mut pin = PinDriver::new_gpio(self.pin as _, gpio_mode_t_GPIO_MODE_INPUT)?;
+        let mut pin = PinDriver::new_gpio(self.release()?, gpio_mode_t_GPIO_MODE_INPUT)?;
 
         pin.set_pull(pull)?;
 
@@ -451,7 +451,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     /// Return an error if the pin cannot be set as output.
     #[inline]
     pub fn try_into_output(self) -> Result<PinDriver<'d, Output>, EspError> {
-        PinDriver::new_gpio(self.pin as _, gpio_mode_t_GPIO_MODE_OUTPUT)
+        PinDriver::new_gpio(self.release()?, gpio_mode_t_GPIO_MODE_OUTPUT)
     }
 
     /// Try to convert the pin driver into an input-output pin driver.
@@ -459,7 +459,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     /// Return an error if the pin cannot be set as input-output.
     #[inline]
     pub fn try_into_input_output(self, pull: Pull) -> Result<PinDriver<'d, InputOutput>, EspError> {
-        let mut pin = PinDriver::new_gpio(self.pin as _, gpio_mode_t_GPIO_MODE_INPUT_OUTPUT)?;
+        let mut pin = PinDriver::new_gpio(self.release()?, gpio_mode_t_GPIO_MODE_INPUT_OUTPUT)?;
 
         pin.set_pull(pull)?;
 
@@ -471,7 +471,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     /// Return an error if the pin cannot be set as output open-drain.
     #[inline]
     pub fn try_into_output_od(self) -> Result<PinDriver<'d, Output>, EspError> {
-        PinDriver::new_gpio(self.pin as _, gpio_mode_t_GPIO_MODE_OUTPUT_OD)
+        PinDriver::new_gpio(self.release()?, gpio_mode_t_GPIO_MODE_OUTPUT_OD)
     }
 
     /// Try to convert the pin driver into an input-output open-drain pin driver.
@@ -482,7 +482,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
         self,
         pull: Pull,
     ) -> Result<PinDriver<'d, InputOutput>, EspError> {
-        let mut pin = PinDriver::new_gpio(self.pin as _, gpio_mode_t_GPIO_MODE_INPUT_OUTPUT_OD)?;
+        let mut pin = PinDriver::new_gpio(self.release()?, gpio_mode_t_GPIO_MODE_INPUT_OUTPUT_OD)?;
 
         pin.set_pull(pull)?;
 
@@ -495,7 +495,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     #[cfg(not(any(esp32c3, esp32c2, esp32h2, esp32h4)))]
     #[inline]
     pub fn try_into_rtc_disabled(self) -> Result<PinDriver<'d, RtcDisabled>, EspError> {
-        PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_DISABLED)
+        PinDriver::new_rtc(self.release()?, rtc_gpio_mode_t_RTC_GPIO_MODE_DISABLED)
     }
 
     /// Try to convert the pin driver into an RTC input pin driver.
@@ -504,7 +504,8 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     #[cfg(not(any(esp32c3, esp32c2, esp32h2, esp32h4)))]
     #[inline]
     pub fn try_into_rtc_input(self, pull: Pull) -> Result<PinDriver<'d, RtcInput>, EspError> {
-        let mut pin = PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_ONLY)?;
+        let mut pin =
+            PinDriver::new_rtc(self.release()?, rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_ONLY)?;
 
         pin.set_pull(pull)?;
 
@@ -517,7 +518,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     #[cfg(not(any(esp32c3, esp32c2, esp32h2, esp32h4)))]
     #[inline]
     pub fn try_into_rtc_output(self) -> Result<PinDriver<'d, RtcOutput>, EspError> {
-        PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_OUTPUT_ONLY)
+        PinDriver::new_rtc(self.release()?, rtc_gpio_mode_t_RTC_GPIO_MODE_OUTPUT_ONLY)
     }
 
     /// Try to convert the pin driver into an RTC output open-drain pin driver.
@@ -526,7 +527,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
     #[cfg(not(any(esp32c3, esp32c2, esp32h2, esp32h4)))]
     #[inline]
     pub fn try_into_rtc_output_od(self) -> Result<PinDriver<'d, RtcOutput>, EspError> {
-        PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_OUTPUT_OD)
+        PinDriver::new_rtc(self.release()?, rtc_gpio_mode_t_RTC_GPIO_MODE_OUTPUT_OD)
     }
 
     /// Try to convert the pin driver into an RTC input-output pin driver.
@@ -539,7 +540,7 @@ impl<'d, MODE> PinDriver<'d, MODE> {
         pull: Pull,
     ) -> Result<PinDriver<'d, RtcInputOutput>, EspError> {
         let mut pin =
-            PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_OUTPUT)?;
+            PinDriver::new_rtc(self.release()?, rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_OUTPUT)?;
 
         pin.set_pull(pull)?;
 
@@ -555,8 +556,10 @@ impl<'d, MODE> PinDriver<'d, MODE> {
         self,
         pull: Pull,
     ) -> Result<PinDriver<'d, RtcInputOutput>, EspError> {
-        let mut pin =
-            PinDriver::new_rtc(self.pin as _, rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_OUTPUT_OD)?;
+        let mut pin = PinDriver::new_rtc(
+            self.release()?,
+            rtc_gpio_mode_t_RTC_GPIO_MODE_INPUT_OUTPUT_OD,
+        )?;
 
         pin.set_pull(pull)?;
 
@@ -1057,6 +1060,32 @@ impl<'d, MODE> PinDriver<'d, MODE> {
         esp!(unsafe { gpio_set_intr_type(self.pin as _, interrupt_type.into()) })?;
 
         Ok(())
+    }
+
+    /// Release the pin of this driver so that it can be re-configured in another mode.
+    ///
+    /// Unlike dropping the driver, this does not reset the pin, so its level, pulls
+    /// and drive strength carry over to the new mode. Only the ISR subscription is
+    /// removed and the pin interrupt is disabled.
+    ///
+    /// Backport of the `try_into_*` part of esp-rs/esp-idf-hal#617 (20246e4b3).
+    /// Dropping `self` after `new_gpio` ran `gpio_reset_without_pull`, which
+    /// disabled the pin that had just been configured.
+    fn release(self) -> Result<PinId, EspError> {
+        let pin = self.pin;
+
+        unsafe {
+            unsubscribe_pin(pin as _)?;
+            esp!(gpio_set_intr_type(
+                pin as _,
+                gpio_int_type_t_GPIO_INTR_DISABLE
+            ))?;
+            esp!(gpio_intr_disable(pin as _))?;
+        }
+
+        core::mem::forget(self);
+
+        Ok(pin)
     }
 
     #[inline]
